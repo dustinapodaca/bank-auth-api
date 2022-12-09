@@ -12,6 +12,7 @@ const withdrawalModel = (sequelize, DataTypes) => {
     {
       type: DataTypes.INTEGER,
       required: true,
+      defaultValue: 0,
     },
   });
   return model;

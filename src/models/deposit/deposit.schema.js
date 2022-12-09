@@ -10,6 +10,7 @@ const depositModel = (sequelize, DataTypes) => {
     amount: {
       type: DataTypes.INTEGER,
       required: true,
+      defaultValue: 0,
     },
   });
   return model;

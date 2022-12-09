@@ -61,6 +61,11 @@ const userModel = (sequelize, DataTypes) => {
         return acl[this.role];
       },
     },
+    balance: {
+      type: DataTypes.INTEGER,
+      required: false,
+      defaultValue: 0,
+    },
   });
 
   model.beforeCreate(async(user) => {
