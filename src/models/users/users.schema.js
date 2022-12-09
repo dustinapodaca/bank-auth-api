@@ -20,7 +20,7 @@ const userModel = (sequelize, DataTypes) => {
     },
     role: {
       type: DataTypes.ENUM,
-      values: ['user', 'banker', 'admin'],
+      values: ['user', 'teller', 'admin'],
       required: true,
       defaultValue: 'user',
     },
@@ -63,8 +63,14 @@ const userModel = (sequelize, DataTypes) => {
     },
     balance: {
       type: DataTypes.INTEGER,
-      required: false,
       defaultValue: 0,
+      //get and set the balance
+      get() {
+        return this.getDataValue('balance');
+      },
+      set(value) {
+        this.setDataValue('balance', value);
+      },
     },
   });
 

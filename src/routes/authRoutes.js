@@ -17,8 +17,8 @@ const userSignUp = async (req, res, next) => {
       refreshToken: userRecord.refreshToken,
     };
     res.status(201).json(output);
-    res.cookie('refreshToken', userRecord.refreshToken, { secure: false, httpOnly: false });
-    res.send();
+    // res.cookie('refreshToken', userRecord.refreshToken, { secure: false, httpOnly: false });
+    // res.send();
   } catch(e) {
     next('User Sign Up Route Error', e);
   }
@@ -32,8 +32,8 @@ const userSignIn = async (req, res, next) => {
       refreshToken: req.user.refreshToken,
     };
     res.status(200).json(user);
-    res.cookie('refreshToken', user.refreshToken, { secure: false, httpOnly: false });
-    res.send();
+    // res.cookie('refreshToken', user.refreshToken, { secure: false, httpOnly: false });
+    // res.send();
   } catch (e) {
     console.error(e);
     next('User Sign In Route Error', e);
@@ -49,12 +49,11 @@ const getUsers = async (req, res, next) => {
         where: { id: req.params.id },
         includes: users,
       });
-    } else {
+    } else if (!req.params.id) {
       allRecords = await users.findAll({});
     }
     if (allRecords) {
-      const allRecordsList = allRecords.map((user) => user.username);
-      return res.status(200).json(allRecordsList);
+      return res.status(200).json(allRecords);
     } else if (oneRecord) {
       return res.status(200).json(oneRecord);
     }
@@ -66,6 +65,7 @@ const getUsers = async (req, res, next) => {
 
 authRouter.post('/signup', userSignUp);
 authRouter.post('/signin', basicAuth, userSignIn);
+authRouter.get('/users', bearerAuth, permissions('update'), getUsers);
 authRouter.get('/users/:id', bearerAuth, permissions('update'), getUsers);
 
 module.exports = authRouter;

@@ -1,5 +1,7 @@
 'use strict';
 
+const { users } = require('./index');
+
 class DataInterface {
   constructor(model) {
     this.model = model;
@@ -11,7 +13,7 @@ class DataInterface {
       if (id) {
         record = await this.model.findOne({
           where: { id },
-          includes: model,
+          includes: users,
         });
       }
       return record;
@@ -31,8 +33,15 @@ class DataInterface {
 
   async update(id, jsonData) {
     try {
-      let record = await this.model.findOne({ where: { id } });
-      return record.update(jsonData);
+      console.log('JSON update data', jsonData);
+      console.log('id', id);
+      await this.model.update(jsonData, { where: { id } });
+      let record = await this.model.findOne({
+        where: { id },
+        includes: users,
+      });
+      console.log('this is update record', record);
+      return record;
     } catch (e) {
       console.error('Update Interface Error', e);
     }

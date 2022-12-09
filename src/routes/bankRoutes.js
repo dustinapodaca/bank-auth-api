@@ -2,6 +2,7 @@
 
 const express = require('express');
 const dataModules = require('../models');
+const { users } = require('../models');
 const bearerAuth = require('../auth/middleware/bearer');
 const permissions = require('../auth/middleware/acl');
 
@@ -17,13 +18,28 @@ bankRouter.param('model', (req, res, next) => {
   }
 });
 
-async function handleGetOne(req, res) {
-  const id = req.params.id;
-  //include the user schema attached to the user id
-  const model = req.model;
-  let theRecord = await req.model.read(id, model);
-  res.status(200).json(theRecord);
-}
+// async function handleGetOne(req, res) {
+//   const id = req.params.id;
+//   //include the user schema attached to the user id
+//   const model = req.model;
+//   let theRecord = await req.model.read(id, model);
+//   res.status(200).json(theRecord);
+// }
+
+const handleGetOne = async (req, res, next) => {
+  try {
+    let oneRecord;
+    if (req.params.id) {
+      oneRecord = await users.findOne({
+        where: { id: req.params.id },
+        includes: users,
+      });
+    }
+    return res.status(200).json(oneRecord);
+  } catch (e) {
+    next('Get User Route Error', e);
+  }
+};
 
 async function handleCreate(req, res) {
   let obj = req.body;
@@ -31,11 +47,18 @@ async function handleCreate(req, res) {
   res.status(201).json(newRecord);
 }
 
-async function handleUpdate(req, res) {
-  const id = req.params.id;
-  const obj = req.body;
-  let updatedRecord = await req.model.update(id, obj);
-  res.status(200).json(updatedRecord);
+async function handleUpdate(req, res, next) {
+  let id = req.params.id;
+  console.log(id);
+  let obj = req.body;
+  console.log('object data', obj);
+  try {
+    let updatedRecord = await req.model.update(id, obj);
+    console.log('updated record', updatedRecord);
+    res.status(200).json(updatedRecord);
+  } catch (e) {
+    next('Update User Route Error', e);
+  }
 }
 
 async function handleDelete(req, res) {
@@ -45,7 +68,7 @@ async function handleDelete(req, res) {
 }
 
 bankRouter.get('/:model/:id', bearerAuth, permissions('read'), handleGetOne);
-bankRouter.post('/:model', bearerAuth, permissions('create'), handleCreate);
+// bankRouter.post('/:model', bearerAuth, permissions('create'), handleCreate);
 bankRouter.put('/:model/:id', bearerAuth, permissions('update'), handleUpdate);
 bankRouter.delete('/:model/:id', bearerAuth, permissions('delete'), handleDelete);
 

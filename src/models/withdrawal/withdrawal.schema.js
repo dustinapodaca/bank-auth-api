@@ -2,10 +2,10 @@
 
 const withdrawalModel = (sequelize, DataTypes) => {
   const model = sequelize.define('Withdrawal', {
-    typeOf:
+    typeof:
     {
       type: DataTypes.ENUM,
-      value: ['cash', 'check', 'mobile', 'wire'],
+      values: ['cash', 'check', 'mobile', 'wire'],
       required: true,
     },
     amount:

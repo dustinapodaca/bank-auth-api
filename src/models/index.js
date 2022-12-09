@@ -15,7 +15,8 @@ const WithdrawalModel = withdrawalSchema(sequelize, DataTypes);
 
 const UserModel = userModel(sequelize, DataTypes);
 
-UserModel.hasMany(DepositModel, WithdrawalModel);
+UserModel.hasMany(DepositModel);
+UserModel.hasMany(WithdrawalModel);
 DepositModel.belongsTo(UserModel);
 WithdrawalModel.belongsTo(UserModel);
 
