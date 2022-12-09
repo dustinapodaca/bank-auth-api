@@ -5,13 +5,14 @@ class DataInterface {
     this.model = model;
   }
 
-  async read(id = null) {
+  async read(id = null, model) {
     try {
       let record;
       if (id) {
-        record = await this.model.findOne({ where: { id } });
-      } else {
-        record = await this.model.findAll();
+        record = await this.model.findOne({
+          where: { id },
+          includes: model,
+        });
       }
       return record;
     } catch(e) {
