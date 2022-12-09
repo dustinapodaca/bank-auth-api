@@ -20,7 +20,8 @@ const userSignUp = async (req, res, next) => {
     // res.cookie('refreshToken', userRecord.refreshToken, { secure: false, httpOnly: false });
     // res.send();
   } catch(e) {
-    next('User Sign Up Route Error', e);
+    console.error(e);
+    // next('User Sign Up Route Error', e.message);
   }
 };
 

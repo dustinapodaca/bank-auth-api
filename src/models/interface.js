@@ -7,13 +7,12 @@ class DataInterface {
     this.model = model;
   }
 
-  async read(id = null, model) {
+  async read(id, model) {
     try {
       let record;
       if (id) {
-        record = await this.model.findOne({
-          where: { id },
-          includes: users,
+        record = await users.findOne({
+          where: { id: id },
         });
       }
       return record;
@@ -35,10 +34,14 @@ class DataInterface {
     try {
       console.log('JSON update data', jsonData);
       console.log('id', id);
-      await this.model.update(jsonData, { where: { id } });
       let record = await this.model.findOne({
         where: { id },
-        includes: users,
+      });
+      record = await users.updateBalance(id, jsonData.amount);
+      console.log('this is record', record);
+      record.update(jsonData, {
+        where: { id },
+        balance: { $add: { balance: jsonData.amount } },
       });
       console.log('this is update record', record);
       return record;

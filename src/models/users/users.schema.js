@@ -16,13 +16,31 @@ const userModel = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       required: true,
-      unique: true,
+      unique: false,
     },
     role: {
       type: DataTypes.ENUM,
       values: ['user', 'teller', 'admin'],
       required: true,
       defaultValue: 'user',
+    },
+    accountNumber: {
+      type: DataTypes.BIGINT,
+      get() {
+        return this.getDataValue('accountNumber');
+      },
+      // always reset the default value of the account number to a random number
+      set() {
+        this.setDataValue('accountNumber', Math.floor(Math.random() * 1000000000 + 111));
+      },
+      required: false,
+      unique: true,
+    },
+    accountType: {
+      type: DataTypes.ENUM,
+      values: ['checking', 'savings'],
+      required: false,
+      defaultValue: 'checking',
     },
     token: {
       type: DataTypes.VIRTUAL,
@@ -77,6 +95,7 @@ const userModel = (sequelize, DataTypes) => {
   model.beforeCreate(async(user) => {
     let hashedPass = await bcrypt.hash(user.password, 6);
     user.password = hashedPass;
+    user.accountNumber = Math.floor(Math.random() * 1000000000 + 111);
     return user;
   });
 
@@ -101,6 +120,27 @@ const userModel = (sequelize, DataTypes) => {
       console.error('authToken Error', e.message);
     }
   };
+
+  //update the user balance
+  // model.updateBalance = async function(id, amount) {
+  //   const user = await this.findOne({ where: { id } });
+  //   console.log('user from updateBalance', user);
+  //   if (amount < 0 && user.balance + amount < 0) {
+  //     return 'Insufficient Funds';
+  //   } else if (amount < 0 && user.balance + amount >= 0) {
+  //     const newBalance = user.balance + amount;
+  //     user.balance = newBalance;
+  //     await user.save();
+  //     return user;
+  //   } else if (amount > 0) {
+  //     const newBalance = user.balance + amount;
+  //     user.balance = newBalance;
+  //     await user.save();
+  //     return user;
+  //   } else {
+  //     return 'Invalid Amount';
+  //   }
+  // };
 
   return model;
 };

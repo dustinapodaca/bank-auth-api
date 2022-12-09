@@ -6,7 +6,7 @@ const { db } = require('./src/models');
 
 const PORT = process.env.PORT || 3004;
 
-const start = async () => {
+const startServer = async () => {
   try {
     await db.sync();
     app.start(PORT);
@@ -15,4 +15,4 @@ const start = async () => {
   }
 };
 
-start();
+startServer();

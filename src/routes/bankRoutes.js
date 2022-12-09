@@ -10,23 +10,21 @@ const bankRouter = express.Router();
 
 bankRouter.param('model', (req, res, next) => {
   const modelName = req.params.model;
+  console.log('modelName', modelName);
   if (dataModules[modelName]) {
     req.model = dataModules[modelName];
+    console.log('req.model.model inside param function', req.model.model);
+    if (req.model.model) {
+      req.model = req.model.model;
+    }
+    console.log('req.model inside param function', req.model);
     next();
   } else {
     next('Invalid Model');
   }
 });
 
-// async function handleGetOne(req, res) {
-//   const id = req.params.id;
-//   //include the user schema attached to the user id
-//   const model = req.model;
-//   let theRecord = await req.model.read(id, model);
-//   res.status(200).json(theRecord);
-// }
-
-const handleGetOne = async (req, res, next) => {
+const userGetOne = async (req, res, next) => {
   try {
     let oneRecord;
     if (req.params.id) {
@@ -41,35 +39,39 @@ const handleGetOne = async (req, res, next) => {
   }
 };
 
-async function handleCreate(req, res) {
-  let obj = req.body;
-  let newRecord = await req.model.create(obj);
-  res.status(201).json(newRecord);
-}
+// async function handleCreate(req, res) {
+//   let obj = req.body;
+//   let newRecord = await req.model.create(obj);
+//   res.status(201).json(newRecord);
+// }
 
-async function handleUpdate(req, res, next) {
+const userUpdateBalance = async (req, res, next) => {
   let id = req.params.id;
-  console.log(id);
   let obj = req.body;
   console.log('object data', obj);
+  console.log('amount', obj.amount);
   try {
-    let updatedRecord = await req.model.update(id, obj);
+    const user = await users.findOne({ where: { id: id } });
+    // use updateBalance method from user model to update balance and then update the record
+    let updatedRecord = await req.model.updateBalance(user, obj.amount);
     console.log('updated record', updatedRecord);
     res.status(200).json(updatedRecord);
   } catch (e) {
     next('Update User Route Error', e);
   }
-}
+};
 
-async function handleDelete(req, res) {
+const userDelete = async (req, res) => {
   let id = req.params.id;
-  let deletedRecord = await req.model.delete(id);
-  res.status(200).json(deletedRecord);
-}
+  let record = await users.findOne({ where: { id: id } });
+  console.log('record', record);
+  await req.model.destroy({ where: { id } });
+  res.status(200).send(`Deleted ${record.username}::${record.role}::${record.accountNumber} from the database.`);
+};
 
-bankRouter.get('/:model/:id', bearerAuth, permissions('read'), handleGetOne);
+bankRouter.get('/:model/:id', bearerAuth, permissions('read'), userGetOne);
 // bankRouter.post('/:model', bearerAuth, permissions('create'), handleCreate);
-bankRouter.put('/:model/:id', bearerAuth, permissions('update'), handleUpdate);
-bankRouter.delete('/:model/:id', bearerAuth, permissions('delete'), handleDelete);
+bankRouter.put('/:model/:id', bearerAuth, permissions('update'), userUpdateBalance);
+bankRouter.delete('/:model/:id', bearerAuth, permissions('delete'), userDelete);
 
 module.exports = bankRouter;
