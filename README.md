@@ -4,7 +4,7 @@
 
 ### Problem Domain
 
-- Build a REST Auth-API using Express, by creating a proper series of endpoints that perform CRUD operations on a database, including server modularization, use of middleware, a model interface, and tests using the REST standard. Implement Role-Based Access Control (RBAC) using an Access Control List (ACL), allowing not only restricted access to routes for valid users, but also based on the individual permissions we give each user.
+- Build a REST Auth-API using Express, by creating a proper series of endpoints that perform CRUD operations on a database, including server modularization, use of middleware, a model interface, and tests using the REST standard. Implement Role-Based Access Control (RBAC) using an Access Control List (ACL), allowing restricted access to routes for valid users based on the individual permissions we give each user on account creation.
 
 ### Links and Resources
 

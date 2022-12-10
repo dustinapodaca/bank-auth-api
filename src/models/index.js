@@ -7,7 +7,9 @@ const depositSchema = require('./deposit/deposit.schema');
 const withdrawalSchema = require('./withdrawal/withdrawal.schema');
 const DataInterface = require('./interface');
 
-const DATABASE_URL = process.env.DATABASE_URL || 'sqlite:memory:';
+const DATABASE_URL = process.env.NODE_ENV === 'test'
+  ? 'sqlite:memory:'
+  : process.env.DATABASE_URL;
 
 const sequelize = new Sequelize(DATABASE_URL);
 const DepositModel = depositSchema(sequelize, DataTypes);

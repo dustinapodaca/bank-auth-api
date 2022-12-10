@@ -33,9 +33,35 @@ const userGetOne = async (req, res, next) => {
         includes: users,
       });
     }
-    return res.status(200).json(oneRecord);
+    if (oneRecord.id !== req.user.id) {
+      next('Access Denied: Invalid User Account');
+    } else {
+      return res.status(200).json(oneRecord);
+    }
   } catch (e) {
     next('Get User Route Error', e);
+  }
+};
+
+const adminGetAllOrOne = async (req, res, next) => {
+  try {
+    let allRecords;
+    let oneRecord;
+    if (!req.params.id) {
+      allRecords = await users.findAll({});
+    } else if (req.params.id) {
+      oneRecord = await users.findOne({
+        where: { id: req.params.id },
+        includes: users,
+      });
+    }
+    if (oneRecord) {
+      return res.status(200).json(oneRecord);
+    } else if (allRecords) {
+      return res.status(200).json(allRecords);
+    }
+  } catch (e) {
+    next('Get All Users Route Error', e);
   }
 };
 
@@ -69,7 +95,9 @@ const userDelete = async (req, res) => {
   res.status(200).send(`Deleted ${record.username}::${record.role}::${record.accountNumber} from the database.`);
 };
 
-bankRouter.get('/:model/:id', bearerAuth, permissions('read'), userGetOne);
+bankRouter.get('/:model', bearerAuth, permissions('update'), adminGetAllOrOne);
+bankRouter.get('/:model/:id', bearerAuth, permissions('update'), adminGetAllOrOne);
+bankRouter.get('/:model/myaccount/:id', bearerAuth, permissions('read'), userGetOne);
 // bankRouter.post('/:model', bearerAuth, permissions('create'), handleCreate);
 bankRouter.put('/:model/:id', bearerAuth, permissions('update'), userUpdateBalance);
 bankRouter.delete('/:model/:id', bearerAuth, permissions('delete'), userDelete);
