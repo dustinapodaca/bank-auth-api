@@ -2,7 +2,7 @@
   "development": {
     "username": "dustinapodaca",
     "password": null,
-    "database": "bank-authAPI",
+    "database": "bankAuthAPI",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
