@@ -10,14 +10,15 @@ const bankRouter = express.Router();
 
 bankRouter.param('model', (req, res, next) => {
   const modelName = req.params.model;
-  console.log('modelName', modelName);
+  // console.log('modelName', modelName);
+  // console.log('req.params', req.params);
   if (dataModules[modelName]) {
     req.model = dataModules[modelName];
     console.log('req.model.model inside param function', req.model.model);
     if (req.model.model) {
       req.model = req.model.model;
     }
-    console.log('req.model inside param function', req.model);
+    // console.log('req.model inside param function', req.model);
     next();
   } else {
     next('Invalid Model');
@@ -74,14 +75,39 @@ const adminGetAllOrOne = async (req, res, next) => {
 const userUpdateBalance = async (req, res, next) => {
   let id = req.params.id;
   let obj = req.body;
-  console.log('object data', obj);
-  console.log('amount', obj.amount);
+  // console.log('object data', obj);
+  // console.log('amount', obj.amount);
   try {
     const user = await users.findOne({ where: { id: id } });
     // use updateBalance method from user model to update balance and then update the record
     let updatedRecord = await req.model.updateBalance(user, obj.amount);
-    console.log('updated record', updatedRecord);
-    res.status(200).json(updatedRecord);
+    // determine previous balance
+    let previousBalance;
+    if (req.params.model === 'withdrawal') {
+      previousBalance = updatedRecord.balance + obj.amount;
+    } else if (req.params.model === 'deposit') {
+      previousBalance = updatedRecord.balance - obj.amount;
+    }
+    let output;
+    if (updatedRecord === 'Error: Insufficient Funds') {
+      output = updatedRecord;
+      return res.status(422).json(output);
+    } else if (updatedRecord) {
+      output = {
+        username: user.username,
+        role: user.role,
+        accountNumber: user.accountNumber,
+        accountType: user.accountType,
+        updatedBalance: updatedRecord.balance,
+        previousBalance: previousBalance,
+        typeOfTransaction: obj.typeof,
+        updatedAt: updatedRecord.updatedAt,
+      };
+    }
+    // console.log('updated record', updatedRecord);
+    // console.log('output', output);
+    // res.status(200).json(updatedRecord);
+    res.status(200).json(output);
   } catch (e) {
     next('Update User Route Error', e);
   }
@@ -90,9 +116,9 @@ const userUpdateBalance = async (req, res, next) => {
 const userDelete = async (req, res) => {
   let id = req.params.id;
   let record = await users.findOne({ where: { id: id } });
-  console.log('record', record);
+  // console.log('record', record);
   await req.model.destroy({ where: { id } });
-  res.status(200).send(`Deleted ${record.username}::${record.role}::${record.accountNumber} from the database.`);
+  res.status(204).send(`Deleted ${record.username}::${record.role}::${record.accountNumber} from the database.`);
 };
 
 bankRouter.get('/:model', bearerAuth, permissions('update'), adminGetAllOrOne);

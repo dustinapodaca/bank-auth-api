@@ -20,7 +20,7 @@ const depositModel = (sequelize, DataTypes) => {
   });
 
   model.updateBalance = async function (user, amount) {
-    console.log('user from deposit updateBalance', user);
+    // console.log('user from deposit updateBalance', user);
     if (amount < 0 && user.balance + amount < 0) {
       return 'Insufficient Funds';
     } else if (amount < 0 && user.balance + amount >= 0) {
