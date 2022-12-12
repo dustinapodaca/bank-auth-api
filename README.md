@@ -32,7 +32,7 @@ see `.env.sample`
 - Feature 4: Auth-API Server
   - `/signup` - POST
   - `/signin` - POST - Basic Auth
-  - `/users` - GET - Bearer Auth
+  - `/users` - GET - Bearer Auth & ACL
 - Feature 5 : RBAC - ACL
   - Bank routes `/transactions` for `/users`, `/deposit`, and `/withdrawal`
   - `/:model/:id` - GET - Bearer Auth & ACL
@@ -45,20 +45,36 @@ see `.env.sample`
 - How do you run tests?
   - `npm test`
 - AuthRoutes.test.js
-  - POST `/signup` - 201
-  - POST `/signin` - 200
-  - GET `/users` - 200 or 403 (if not admin or teller)
+  - allow POST `/signup` a testUser - 201
+  - allow POST `/signup` a testTeller - 201
+  - allow POST `/signup` a testAdmin - 201
+  - allow POST `/signin` a testUser - 200
+  - allow POST `/signin` a testTeller - 200
+  - allow POST `/signin` a testAdmin - 200
+  - deny GET `Access Denied` - to GET all users with only basicAuth - 403
+  - deny GET `Access Denied` - to GET all users without update permissions - 403
+  - allow GET `/users` - to GET all users with teller (update) permissions - 200
+  - allow GET `/users` - to GET all users with admin (update, delete) permissions - 200
+  - allow GET `/users/1` - to GET one user by id with teller and admin permissions - 200
+
 - BankRoutes.test.js - `('/transaction/:model')`
-  - GET `/users/:id` - 200 (for user)
-  - GET `/users/:id` - 403 (for non-user)
-  - GET `/users` - 200 or 403 (if not admin or teller)
-  - PUT `/deposit/:id` - 200 or 403 (if not admin or teller)
-  - PUT `/withdrawal/:id` - 200 or 403 (if not admin or teller)
-  - PUT `/users/:id` - 200 or 403 (if not admin or teller)
-  - DELETE `/:model/:id` - 200 or 403 (if not admin or teller)
+  - allow teller access PUT `/transaction/deposit` - to PUT a deposit in any user account and update user balance - 200
+  - allow teller access PUT `/transaction/withdrawal` - to PUT a withdrawal in any user account and update user balance - 200
+  - allow admin access PUT `/transaction/deposit` - to PUT a deposit in any user account and update user balance - 200
+  - allow admin access PUT `/transaction/withdrawal` - to PUT a withdrawal in any user account and update user balance - 200
+  - deny user access PUT `/transaction/deposit` - to PUT a deposit in user account - 403
+  - deny user access PUT `/transaction/withdrawal` - to PUT a withdrawal in user account - 403
+  - return 422 error PUT `/transaction/withdrawal` - if the user has insufficient funds to process the transaction - 422
+  - deny user access GET `/transaction/users` - to GET all user accounts - 403
+  - deny user access GET `/transaction/myaccount/users/2` - to GET a different user account - 403
+  - allow user access GET `/transaction/myaccount/users/1` - to GET their own user account - 200
+  - allow teller and admin access GET `/transaction/users` - to GET all user accounts - 200
+  - allow teller and admin access GET `/transaction/users/1` - to GET a different user account by id - 200
+  - deny user and teller access DELETE `/transaction/users/1` - to DELETE a user account - 500
+  - allow admin access DELETE `/transaction/users/1` - to DELETE a user account - 204
 
 #### UML
 
-Link to an image of the UML for your application and response to events
+Link to an image of the UML for your application and response to events:
 
-![UML](./assets/img/Screenshot_20221208_030501.png)
+![UML](./assets/img/UML-RBAC-BankAPI.png)
