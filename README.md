@@ -35,8 +35,9 @@ see `.env.sample`
   - `/users` - GET - Bearer Auth & ACL
 - Feature 5 : RBAC - ACL
   - Bank routes `/transactions` for `/users`, `/deposit`, and `/withdrawal`
-  - `/:model/:id` - GET - Bearer Auth & ACL
   - `/:model` - GET - Bearer Auth & ACL
+  - `/:model/:id` - GET - Bearer Auth & ACL
+  - `/:model/myaccount/:id` - GET - Bearer Auth & ACL
   - `/:model:id` - PUT - Bearer Auth & ACL
   - `/:model:id` - DELETE - Bearer Auth & ACL
 
