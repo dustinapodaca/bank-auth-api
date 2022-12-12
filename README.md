@@ -33,6 +33,7 @@ see `.env.sample`
   - `/signup` - POST
   - `/signin` - POST - Basic Auth
   - `/users` - GET - Bearer Auth & ACL
+  - `/users/:id` - GET - Bearer Auth & ACL
 - Feature 5 : RBAC - ACL
   - Bank routes `/transactions` for `/users`, `/deposit`, and `/withdrawal`
   - `/:model` - GET - Bearer Auth & ACL
