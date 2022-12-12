@@ -79,4 +79,4 @@ see `.env.sample`
 
 Link to an image of the UML for your application and response to events:
 
-![UML](./assets/img/UML-RBAC-Bank-API.png)
+![UML](./assets/img/UML-RBAC-BankAPI.png)
