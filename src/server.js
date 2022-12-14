@@ -21,8 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 //routes
 app.use(authRoutes);
-app.use('/transaction', bankRoutes); //http://localhost:3001/transaction/deposit : withdrawal
-
+//http://localhost:3001/transaction/deposit : withdrawal : users
+app.use('/transaction', bankRoutes);
 app.get('/', (req, res) => {
   res.status(200).send('Hello, welcome to the Bank Server');
 });
